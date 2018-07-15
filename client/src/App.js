@@ -3,9 +3,11 @@ import { Row, Col } from 'react-materialize';
 import Nav from './Components/Header/Nav';
 import Modal from './Components/Others/Modal';
 import { URL_API, URL_IMAGE_UPLOAD } from './Types';
+import SweetAlert from 'sweetalert-react';
 import ImageUploader from 'react-images-upload';
 import axios from 'axios';
 import './App.css';
+import 'sweetalert/dist/sweetalert.css';
 
 class App extends Component {
 
@@ -19,7 +21,8 @@ class App extends Component {
 			data_watson_image:null,
 			location_face: null,
 			image_loaded_data: {},
-			show_modal: false
+			show_modal: false,
+			null_faces: false
 		};
 		this.image_ref = React.createRef();
 		this.onDrop = this.onDrop.bind(this);
@@ -79,9 +82,9 @@ class App extends Component {
 			this.hide_modal();
 			this.setState({
 				data_watson_image: response.data,
-				location_face: response.data.images[0].faces
+				location_face: response.data.images[0].faces,
+				null_faces: response.data.images[0].faces.length === 0 ? true:false,
 			});
-			//this.calculateValueBoxes(response.data.images[0].faces);
 		}).catch(err => {
 			console.log("ERR: ", err);
 		})
@@ -192,6 +195,12 @@ class App extends Component {
 					</div>
 				</main>
 				<Modal show_modal={this.state.show_modal}/>
+				<SweetAlert
+        			show={this.state.null_faces}
+					title="Ops..."
+					text="Nenhum rosto foi encontrado nesta foto"
+					onConfirm={() => this.setState({ null_faces: false })}
+				/>
 			</div>
 		);
 	}
